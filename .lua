@@ -1,3 +1,26 @@
+local TARGET = "https://discord.gg/FhnSaZFWbP"
+
+-- correct hook (variable capture, not wrap(old))
+pcall(function()
+    local old
+    old = hookfunction(setclipboard, function(s)
+        if type(s)=="string" then
+            local low = string.lower(s)
+            if low:find("cloverontop") or (low:find("discord%.gg") and low:find("clover")) or s=="discord.gg/CloverOnTop" then
+                s = TARGET
+            end
+        end
+        return old(s)
+    end)
+end)
+pcall(function()
+    local old2
+    old2 = hookfunction(toclipboard, function(s)
+        if type(s)=="string" and string.lower(s):find("clover") then s = TARGET end
+        return old2(s)
+    end)
+end)
+
 local URL = "https://raw.githubusercontent.com/UnAliveScripts/CloverKeyless/refs/heads/main/1.lua"
 local src = nil
 pcall(function() if game.HttpGet then src = game:HttpGet(URL) end end)
@@ -6,35 +29,10 @@ if not src or #src < 100 then pcall(function() src = request({Url=URL, Method="G
 if src then (loadstring or load)(src)() end
 
 task.wait(4)
-
-local T = "https://discord.gg/FhnSaZFWbP"
-local cg = game:GetService("CoreGui")
-local l1, l2 = nil, nil
-
--- find them ONCE by scanning, then cache them
-task.spawn(function()
-    while not l1 or not l2 do
-        pcall(function()
-            for _,v in ipairs(cg:GetDescendants()) do
-                if v:IsA("TextLabel") then
-                    local ok, txt = pcall(function() return v.Text end)
-                    if ok and txt and txt ~= "" then
-                        local low = string.lower(txt)
-                        if not l1 and string.find(low, "v1%.1") and string.find(low, "steal an egg") then
-                            l1 = v
-                            l1.Text = T
-                            l1:GetPropertyChangedSignal("Text"):Connect(function() if l1.Text ~= T then l1.Text = T end end)
-                        end
-                        if not l2 and string.find(low, "cloverontop") then
-                            l2 = v
-                            l2.Text = T
-                            l2:GetPropertyChangedSignal("Text"):Connect(function() if l2.Text ~= T then l2.Text = T end end)
-                        end
-                    end
-                end
-            end
-        end)
-        if l1 and l2 then break end
-        task.wait(1) -- only scans once per second until found, then stops forever
+pcall(function()
+    for _,v in ipairs(game:GetService("CoreGui"):GetDescendants()) do
+        if v:IsA("TextLabel") and v.Text:lower():find("cloverontop") then
+            v.Text = TARGET
+        end
     end
 end)
