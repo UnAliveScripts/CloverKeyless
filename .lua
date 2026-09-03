@@ -1,4 +1,29 @@
-local URL = "https://raw.githubusercontent.com/UnAliveScripts/CloverKeyless/refs/heads/main/.lua"
+local TARGET = "https://discord.gg/FhnSaZFWbP"
+local T = TARGET
+
+-- 1. hook copy BEFORE load (so button copies your invite)
+pcall(function()
+    local old
+    old = hookfunction(setclipboard, function(s)
+        if type(s)=="string" then
+            local low = string.lower(s)
+            if low:find("cloverontop") or (low:find("discord%.gg") and low:find("clover")) or s=="discord.gg/CloverOnTop" then
+                s = TARGET
+            end
+        end
+        return old(s)
+    end)
+end)
+pcall(function()
+    local old2
+    old2 = hookfunction(toclipboard, function(s)
+        if type(s)=="string" and string.lower(s):find("clover") then s = TARGET end
+        return old2(s)
+    end)
+end)
+
+-- 2. load Clover (only once)
+local URL = "https://raw.githubusercontent.com/UnAliveScripts/CloverKeyless/refs/heads/main/1.lua"
 local src = nil
 pcall(function() if game.HttpGet then src = game:HttpGet(URL) end end)
 if not src or #src < 100 then pcall(function() if httpget then src = httpget(URL) end end) end
@@ -7,11 +32,10 @@ if src then (loadstring or load)(src)() end
 
 task.wait(4)
 
-local T = "https://discord.gg/FhnSaZFWbP"
+-- 3. edit texts (find once, cache, no lag)
 local cg = game:GetService("CoreGui")
 local l1, l2 = nil, nil
 
--- find them ONCE by scanning, then cache them
 task.spawn(function()
     while not l1 or not l2 do
         pcall(function()
@@ -35,6 +59,6 @@ task.spawn(function()
             end
         end)
         if l1 and l2 then break end
-        task.wait(1) -- only scans once per second until found, then stops forever
+        task.wait(1)
     end
 end)
