@@ -1,7 +1,34 @@
-local TARGET = "https://discord.gg/FhnSaZFWbP"
-local T = TARGET
+-- CloverHub Patched Loader - PUBLIC VERSION
+-- Host this file raw: loadstring(game:HttpGet("https://raw.githubusercontent.com/YOURNAME/YOURREPO/main/CloverHub_Patched.lua"))()
 
--- 1. hook copy BEFORE load (so button copies your invite)
+local TARGET = "https://discord.gg/FhnSaZFWbP"
+
+-- 0. PATCH SOURCE BEFORE LOADSTRING (baked in - survives Auto Load/Config)
+pcall(function()
+    local oldHttp
+    oldHttp = hookfunction(game.HttpGet, function(self, url, ...)
+        local src = oldHttp(self, url, ...)
+        if type(src)=="string" and url:find("CloverKeyless") then
+            src = src:gsub("discord%.gg/CloverOnTop", "discord.gg/FhnSaZFWbP")
+            src = src:gsub("discord%.gg%/[Cc]loverOnTop", "discord.gg/FhnSaZFWbP")
+        end
+        return src
+    end)
+end)
+pcall(function()
+    if httpget and hookfunction then
+        local old2
+        old2 = hookfunction(httpget, function(url, ...)
+            local src = old2(url, ...)
+            if type(src)=="string" and url:find("CloverKeyless") then
+                src = src:gsub("discord%.gg/CloverOnTop", "discord.gg/FhnSaZFWbP")
+            end
+            return src
+        end)
+    end
+end)
+
+-- 1. hook copy BEFORE load
 pcall(function()
     local old
     old = hookfunction(setclipboard, function(s)
@@ -46,13 +73,13 @@ task.spawn(function()
                         local low = string.lower(txt)
                         if not l1 and string.find(low, "v1%.1") and string.find(low, "steal an egg") then
                             l1 = v
-                            l1.Text = T
-                            l1:GetPropertyChangedSignal("Text"):Connect(function() if l1.Text ~= T then l1.Text = T end end)
+                            l1.Text = TARGET
+                            l1:GetPropertyChangedSignal("Text"):Connect(function() if l1.Text ~= TARGET then l1.Text = TARGET end end)
                         end
                         if not l2 and string.find(low, "cloverontop") then
                             l2 = v
-                            l2.Text = T
-                            l2:GetPropertyChangedSignal("Text"):Connect(function() if l2.Text ~= T then l2.Text = T end end)
+                            l2.Text = TARGET
+                            l2:GetPropertyChangedSignal("Text"):Connect(function() if l2.Text ~= TARGET then l2.Text = TARGET end end)
                         end
                     end
                 end
